@@ -1,66 +1,48 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Rick and Morty | Ryan Lopes</title>
-  <link rel="stylesheet" href="./assets/logo.png">
-  <link rel="icon" href="./assets/logo.png" type="image/x-icon">
-  <link rel="stylesheet" href="./style.css">
-  <script src="https://kit.fontawesome.com/a747b09475.js" crossorigin="anonymous"></script>
-  <script src="./script.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Rick and Morty | Ryan Lopes</title>
+    <link rel="icon" href="./assets/logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a747b09475.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
-        <a href="./index.html">
-          <div class="logo">
-            <img class="logo-img" alt="logo" src="./logo.png"/>
+        <a href="./index.html" class="logo">
+            <img class="logo-img" alt="logo" src="./assets/logo.png"/>
             <span class="logo-text">Characters</span>
-          </div>
         </a>
-
         <div class="social-media">
-            <a href="https://www.instagram.com" target="_blank">
-                <i class="fa-brands fa-instagram"></i>
-            </a>
-
-           <a href="https://www.facebook.com">
-            <i class="fa-brands fa-facebook-f"></i>
-           </a>
-            
-            <a href="https://github.com/RYANALVESLOPES">
-                <i class="fa-brands fa-github"></i>
-            </a>
-           <a href="https://www.linkedin.com/in/ryan-alves-de-oliveira-lopes-656967263/">
-            <i class="fa-brands fa-linkedin-in"></i>
-           </a>
-            
+            <a href="https://www.instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://www.facebook.com" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://github.com/RYANALVESLOPES" target="_blank"><i class="fa-brands fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/ryan-alves-de-oliveira-lopes-656967263/" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
         </div>
-      </header>
+    </header>
 
-      <div class="main-container">
-    
-        <h2>Conheca todos os personagens de Rick and Morty em um só lugar</h2>
-    
-        <div class="main-content" id="main-content"></div>
-    
-        <div class="modal" id="modal" onclick="hideModal()">
-          <div class="modal-content" id="modal-content"></div>
+    <main class="main-container">
+        <h2>Conheça todos os personagens de Rick and Morty em um só lugar</h2>
+        <div id="main-content" class="main-content">
+            <div id="loader" class="loader">Carregando...</div>
         </div>
-    
         <div class="buttons">
-          <button id="back-button" disabled>Anterior</button>
-          <button id="next-button" disabled>Próxima</button>
+            <button id="back-button">Anterior</button>
+            <button id="next-button">Próxima</button>
         </div>
-    
-      </div>
-    
-      <footer>
+    </main>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            </div>
+    </div>
+
+    <footer>
         <p class="footer-logo">The Rick and Morty Characters</p>
-        <p class="copyrigth">Desenvolvido por &copy; Ryan Lopes</p>
-      </footer>
-    
-    
-      
-    </body>
-    </html>
+        <p class="copyright">Desenvolvido por &copy; Ryan Lopes</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

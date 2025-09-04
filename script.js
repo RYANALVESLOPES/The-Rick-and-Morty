@@ -1,30 +1,59 @@
-let currentPageUrl = 'https://rickandmortyapi.com/api/character';
+document.addEventListener('DOMContentLoaded', () => {
 
-window.onload = async () => {
+  const mainContent = document.getElementById('main-content');
+  const modal = document.getElementById('modal');
+  const modalContent = document.querySelector('.modal-content');
   const nextButton = document.getElementById('next-button');
   const backButton = document.getElementById('back-button');
+  const loader = document.getElementById('loader');
 
-  nextButton.addEventListener('click', loadNextPage);
-  backButton.addEventListener('click', loadPreviousPage);
+ 
+  const state = {
+    nextPageUrl: '',
+    prevPageUrl: '',
+    initialUrl: 'https://rickandmortyapi.com/api/character',
+  };
 
-  try {
-    await loadCharacters(currentPageUrl);
-  } catch (error) {
-    console.error(error);
-    alert('Erro ao carregar personagens.');
+  
+  function toggleLoader(isLoading) {
+    if (isLoading) {
+      mainContent.innerHTML = '';
+      loader.classList.add('active');
+    } else {
+      loader.classList.remove('active');
+    }
   }
-};
 
-async function loadCharacters(url) {
-  const mainContent = document.getElementById('main-content');
-  mainContent.innerHTML = '';
+  
+  function displayError(message) {
+    mainContent.innerHTML = `<p class="error-message">${message}</p>`;
+  }
 
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Falha na requisição');
-    const data = await response.json();
+  
+  async function loadCharacters(url) {
+    toggleLoader(true);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      toggleLoader(false);
+      renderCharacters(data.results);
+      updatePagination(data.info);
 
-    data.results.forEach(character => {
+    } catch (error) {
+      console.error('Falha ao carregar personagens:', error);
+      toggleLoader(false);
+      displayError('Não foi possível carregar os personagens. Tente novamente mais tarde.');
+    }
+  }
+
+  
+  function renderCharacters(characters) {
+    mainContent.innerHTML = '';
+    characters.forEach(character => {
       const card = document.createElement('div');
       card.className = 'cards';
       card.style.backgroundImage = `url('${character.image}')`;
@@ -38,68 +67,73 @@ async function loadCharacters(url) {
 
       nameBg.appendChild(name);
       card.appendChild(nameBg);
-
       card.addEventListener('click', () => showModal(character));
-
       mainContent.appendChild(card);
     });
-
-    // Controle dos botões
-    const nextButton = document.getElementById('next-button');
-    const backButton = document.getElementById('back-button');
-    nextButton.disabled = !data.info.next;
-    backButton.disabled = !data.info.prev;
-    backButton.style.visibility = data.info.prev ? 'visible' : 'hidden';
-
-    currentPageUrl = url;
-
-  } catch (error) {
-    console.error(error);
-    alert('Erro ao carregar personagens');
   }
-}
+  
+  
+  function updatePagination(info) {
+    state.nextPageUrl = info.next;
+    state.prevPageUrl = info.prev;
 
-function showModal(character) {
-  const modal = document.getElementById('modal');
-  const modalContent = document.getElementById('modal-content');
-  modalContent.innerHTML = '';
-  modal.style.visibility = 'visible';
+    nextButton.disabled = !state.nextPageUrl;
+    backButton.disabled = !state.prevPageUrl;
+    backButton.style.visibility = state.prevPageUrl ? 'visible' : 'hidden';
+  }
 
-  const img = document.createElement('div');
-  img.className = 'character-image';
-  img.style.backgroundImage = `url('${character.image}')`;
+  
+   
+    
+   
+  function showModal(character) {
+    modalContent.innerHTML = '';
 
-  const details = [
-    `Nome: ${character.name}`,
-    `Status: ${character.status}`,
-    `Especie: ${character.species}`,
-    `Genero: ${character.gender}`,
-    `Nacimento: ${character.origin.name}`,
-  ];
+    const img = document.createElement('div');
+    img.className = 'character-image';
+    img.style.backgroundImage = `url('${character.image}')`;
+    
+    modalContent.appendChild(img);
 
-  modalContent.appendChild(img);
-  details.forEach(text => {
-    const span = document.createElement('span');
-    span.className = 'character-details';
-    span.innerText = text;
-    modalContent.appendChild(span);
+    const detailsList = [
+      `Nome: ${character.name}`,
+      `Status: ${character.status}`,
+      `Especie: ${character.species}`,
+      `Genero: ${character.gender}`,
+      `Casa: ${character.origin.name}`,
+    ];
+
+    detailsList.forEach(detailText => {
+      const detailElement = document.createElement('span');
+      detailElement.className = 'character-details';
+      detailElement.innerText = detailText;
+      modalContent.appendChild(detailElement);
+    });
+
+    modal.classList.add('active');
+  }
+
+  
+  function hideModal() {
+    modal.classList.remove('active');
+  }
+
+  
+
+  nextButton.addEventListener('click', () => {
+    if (state.nextPageUrl) loadCharacters(state.nextPageUrl);
   });
-}
 
-function hideModal() {
-  document.getElementById('modal').style.visibility = 'hidden';
-}
+  backButton.addEventListener('click', () => {
+    if (state.prevPageUrl) loadCharacters(state.prevPageUrl);
+  });
 
-async function loadNextPage() {
-  if (!currentPageUrl) return;
-  const response = await fetch(currentPageUrl);
-  const data = await response.json();
-  if (data.info.next) loadCharacters(data.info.next);
-}
+  modal.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      hideModal();
+    }
+  });
 
-async function loadPreviousPage() {
-  if (!currentPageUrl) return;
-  const response = await fetch(currentPageUrl);
-  const data = await response.json();
-  if (data.info.prev) loadCharacters(data.info.prev);
-}
+  
+  loadCharacters(state.initialUrl);
+});
