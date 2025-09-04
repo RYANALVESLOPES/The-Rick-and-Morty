@@ -1,0 +1,20 @@
+{
+  "name": "site-star",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RYANALVESLOPES/SITE-STAR.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RYANALVESLOPES/SITE-STAR/issues"
+  },
+  "homepage": "https://github.com/RYANALVESLOPES/SITE-STAR#readme",
+  "description": ""
+}

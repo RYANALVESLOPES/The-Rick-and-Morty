@@ -1,166 +1,105 @@
-
-let currentPageUrl = 'https://swapi.dev/api/people/';
+let currentPageUrl = 'https://rickandmortyapi.com/api/character';
 
 window.onload = async () => {
+  const nextButton = document.getElementById('next-button');
+  const backButton = document.getElementById('back-button');
+
+  nextButton.addEventListener('click', loadNextPage);
+  backButton.addEventListener('click', loadPreviousPage);
+
   try {
     await loadCharacters(currentPageUrl);
   } catch (error) {
-    console.log(error);
-    alert('Erro ao carregar cards');
+    console.error(error);
+    alert('Erro ao carregar personagens.');
   }
-
-  const nextButton = document.getElementById('next-button');
-  nextButton.addEventListener('click', loadNextPage);
-
-  const backButton = document.getElementById('back-button');
-  backButton.addEventListener('click', loadPreviousPage);
 };
 
 async function loadCharacters(url) {
   const mainContent = document.getElementById('main-content');
-  mainContent.innerHTML = ''; // Limpa os resultados anteriores da pagina
+  mainContent.innerHTML = '';
 
   try {
     const response = await fetch(url);
-    const responseJson = await response.json();
+    if (!response.ok) throw new Error('Falha na requisição');
+    const data = await response.json();
 
-    responseJson.results.forEach((character) => {
-      const card = document.createElement("div");
-      card.style.backgroundImage = `url('https://starwars-visualguide.com/assets/img/characters/${character.url.replace(/\D/g, "")}.jpg')`
-      card.className = "cards"
-      const characterNameBG = document.createElement("div")
-      characterNameBG.className = "character-name-bg"
-      const characterName = document.createElement("span")
-      characterName.className = "character-name"
-      characterName.innerText = `${character.name}`
-      characterNameBG.appendChild(characterName)
-      card.appendChild(characterNameBG)
-      card.onclick = () => {
-        const modal = document.getElementById("modal")
-        modal.style.visibility = "visible"
-        const modalContent = document.getElementById("modal-content")
-        modalContent.innerHTML = ''
+    data.results.forEach(character => {
+      const card = document.createElement('div');
+      card.className = 'cards';
+      card.style.backgroundImage = `url('${character.image}')`;
 
-        const characterImage = document.createElement("div")
-        characterImage.style.backgroundImage = `url('https://starwars-visualguide.com/assets/img/characters/${character.url.replace(/\D/g, "")}.jpg')`
-        characterImage.className = "character-image"
+      const nameBg = document.createElement('div');
+      nameBg.className = 'character-name-bg';
 
-        const name = document.createElement("span")
-        name.className = "character-details"
-        name.innerText = `Nome: ${character.name}`
+      const name = document.createElement('span');
+      name.className = 'character-name';
+      name.innerText = character.name;
 
-        const characterHeight = document.createElement("span")
-        characterHeight.className = "character-details"
-        characterHeight.innerText = `Altura: ${convertHeight(character.height)}`
+      nameBg.appendChild(name);
+      card.appendChild(nameBg);
 
-        const mass = document.createElement("span")
-        mass.className = "character-details"
-        mass.innerText = `Peso: ${convertMass(character.mass)}`
+      card.addEventListener('click', () => showModal(character));
 
-        const eyeColor = document.createElement("span")
-        eyeColor.className = "character-details"
-        eyeColor.innerText = `Cor dos olhos: ${convertEyeColor(character.eye_color)}`
-
-        const birthYear = document.createElement("span")
-        birthYear.className = "character-details"
-        birthYear.innerText = `Nascimento: ${convertBirthYear(character.birth_year)}`
-
-        modalContent.appendChild(characterImage)
-        modalContent.appendChild(name)
-        modalContent.appendChild(characterHeight)
-        modalContent.appendChild(mass)
-        modalContent.appendChild(eyeColor)
-        modalContent.appendChild(birthYear)
-      }
-      const mainContent = document.getElementById('main-content');
       mainContent.appendChild(card);
-
     });
 
-    
+    // Controle dos botões
     const nextButton = document.getElementById('next-button');
     const backButton = document.getElementById('back-button');
-    nextButton.disabled = !responseJson.next;
-    backButton.disabled = !responseJson.previous;
-
-    backButton.style.visibility = responseJson.previous ? "visible" : "hidden";
+    nextButton.disabled = !data.info.next;
+    backButton.disabled = !data.info.prev;
+    backButton.style.visibility = data.info.prev ? 'visible' : 'hidden';
 
     currentPageUrl = url;
+
   } catch (error) {
-    throw new Error('Erro ao carregar personagens');
+    console.error(error);
+    alert('Erro ao carregar personagens');
   }
+}
+
+function showModal(character) {
+  const modal = document.getElementById('modal');
+  const modalContent = document.getElementById('modal-content');
+  modalContent.innerHTML = '';
+  modal.style.visibility = 'visible';
+
+  const img = document.createElement('div');
+  img.className = 'character-image';
+  img.style.backgroundImage = `url('${character.image}')`;
+
+  const details = [
+    `Nome: ${character.name}`,
+    `Status: ${character.status}`,
+    `Especie: ${character.species}`,
+    `Genero: ${character.gender}`,
+    `Nacimento: ${character.origin.name}`,
+  ];
+
+  modalContent.appendChild(img);
+  details.forEach(text => {
+    const span = document.createElement('span');
+    span.className = 'character-details';
+    span.innerText = text;
+    modalContent.appendChild(span);
+  });
 }
 
 function hideModal() {
-  const modal = document.getElementById("modal")
-  modal.style.visibility = "hidden"
-}
-
-function convertEyeColor(eyeColor) {
-  const cores = {
-    blue: "azul",
-    brown: "castanho",
-    green: "verde",
-    yellow: "amarelo",
-    black: "preto",
-    pink: "rosa",
-    red: "vermelho",
-    orange: "laranja",
-    hazel: "avela",
-    unknown: "desconhecida"
-  };
-
-  return cores[eyeColor.toLowerCase()] || eyeColor;
-}
-
-function convertHeight(height) {
-  if (height === "unknown") {
-    return "desconhecida";
-  }
-  
-  return (height / 100).toFixed(2);
-}
-
-function convertMass(mass) {
-  if (mass === "unknown") {
-    return "desconhecido";
-  }
-  
-  return `${mass} kg`;
-}
-
-function convertBirthYear(birthYear) {
-  if (birthYear === "unknown") {
-    return "desconhecido";
-  }
-  
-  return birthYear;
+  document.getElementById('modal').style.visibility = 'hidden';
 }
 
 async function loadNextPage() {
   if (!currentPageUrl) return;
-
-  try {
-    const response = await fetch(currentPageUrl);
-    const responseJson = await response.json();
-
-    await loadCharacters(responseJson.next);
-  } catch (error) {
-    console.log(error);
-    alert('Erro ao carregar a próxima página');
-  }
+  const response = await fetch(currentPageUrl);
+  const data = await response.json();
+  if (data.info.next) loadCharacters(data.info.next);
 }
 
 async function loadPreviousPage() {
   if (!currentPageUrl) return;
-
-  try {
-    const response = await fetch(currentPageUrl);
-    const responseJson = await response.json();
-
-    await loadCharacters(responseJson.previous);
-  } catch (error) {
-    console.log(error);
-    alert('Erro ao carregar a página anterior');
-  }
+  const response = await fetch(currentPageUrl);
+  const data = await response.json();
+  if (data.info.prev) loadCharacters(data.info.prev);
 }
